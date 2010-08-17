@@ -13,7 +13,7 @@ class TCAdmin {
 	/*
 	 * Error Constants
 	 */
-	const ERROR_UNKNOWN = 0;
+	const ERROR_NONE = 0;
 	const ERROR_MISSINGCURL = 1;
 	const ERROR_CONNECTSTRING = 2;
 	const ERROR_CURLCMDFAILED = 3;
@@ -38,13 +38,20 @@ class TCAdmin {
 	const CMD_UPDATE_PASSWORD = 'ChangePassword';
 
 	/*
+	 * Status settings
+	 */
+	const SETUP_PENDING = 1;
+	const SETUP_COMPLETE = 2;
+	const SETUP_ERRORED = 3;
+
+	/*
 	 * RDP Settings
 	 */
 	protected $rdp_url = false;
 	protected $rdp_username = false;
 	protected $rdp_password = false;
 
-	protected $erro_no = 0;
+	protected $error_no = self::ERROR_NONE;
 	protected $error_msg = '';
 
 	/**
@@ -53,8 +60,6 @@ class TCAdmin {
 	 * @var string
 	 */
 	protected $rdp_response_type = self::RESPONSE_TYPE_XML;
-
-
 
 	// Create new class with static call.
 	public static function factory()
@@ -100,6 +105,7 @@ class TCAdmin {
 		$data[self::FIELD_PASSWORD] = $this->rdp_password;
 		$data[self::FIELD_RESPONSETYPE] = $this->rdp_response_type;
 
+		// Init cURL
 		$ch = curl_init();
 
 		// Setup the options
@@ -123,7 +129,6 @@ class TCAdmin {
 
 		curl_close($ch);
 
-
 		if(($xml = simplexml_load_string($result)) === false)
 		{
 			throw new TCAdminException('Unable to parse return as XML.', self::ERROR_CURLRESPONSEINVALID);
@@ -146,6 +151,16 @@ class TCAdmin {
 		$xpath = new DOMXPath($dom);
 
 		echo $dom->saveXML();*/
+	}
+
+	public function getErrorCode()
+	{
+		return $this->error_no;
+	}
+
+	public function getErrorMsg()
+	{
+		return $this->error_msg;
 	}
 
 	/**
@@ -190,11 +205,8 @@ class TCAdmin {
 		}
 		else // We hit an error
 		{
-			$this->errorcode = $res->errorcode;
+			$this->error_no = $res->errorcode;
 			$this->error_msg = $res->errortext;
-
-			print_r($data);
-			print_r($res);
 
 			return false;
 		}
