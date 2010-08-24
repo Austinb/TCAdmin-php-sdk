@@ -87,7 +87,7 @@ class TCAdmin {
 		}
 
 		// Create the url we are actually connecting to.
-		$this->rdp_url =  $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?$connect['query']:'');
+		$this->rdp_url =  $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?'?'.$connect['query']:'');
 
 		// Set the RDP username
 		$this->rdp_username = $connect['user'];
@@ -218,7 +218,7 @@ class TCAdmin {
  */
 class TCAdminException extends Exception
 {
-	public function __construct($message, $code=TCAdmin::ERROR_UNKNOWN)
+	public function __construct($message, $code=0)
 	{
 		return parent::__construct('TCAdmin: '. $message, $code);
 	}
