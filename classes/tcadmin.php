@@ -30,9 +30,23 @@ class TCAdmin {
 	const FIELD_FUNCTION = 'function';
 	const FIELD_RESPONSETYPE = 'response_type';
 
+	const FIELD_CLIENT_PACKAGE_ID = 'client_package_id';
+	const FIELD_CLIENT_ID = 'client_id';
+	const FIELD_SKIP_PAGE = 'skip_page';
+
+	const FIELD_USER_EMAIL = 'user_email';
+	const FIELD_USER_NAME = 'user_name';
+	const FIELD_USER_FNAME = 'user_fname';
+	const FIELD_USER_LNAME = 'user_lname';
+	const FIELD_USER_PASSWORD = 'user_password';
+
 	const CMD_GET_GAMESERVERS = 'GetSupportedGames';
 	const CMD_GET_VOICESERVERS = 'GetSupportedVoiceServers';
 	const CMD_ADD_SETUP = 'AddPendingSetup';
+
+	const CMD_SUSPEND_SERVICES = 'SuspendGameAndVoiceByBillingID';
+	const CMD_UNSUSPEND_SERVICES = 'UnSuspendGameAndVoiceByBillingID';
+	const CMD_DELETE_SERVICES = 'DeleteGameAndVoiceByBillingID';
 
 	const CMD_UPDATE_SETTINGS = 'UpdateSettings';
 	const CMD_UPDATE_PASSWORD = 'ChangePassword';
@@ -201,9 +215,78 @@ class TCAdmin {
 	 *
 	 * @param array $data
 	 */
-	public function addServer($data=array())
+	public function addService($data=array())
 	{
 		$data[self::FIELD_FUNCTION] = self::CMD_ADD_SETUP;
+
+		$res = $this->_remoteCall($data);
+
+		// Went ok
+		if($res->errorcode == 0)
+		{
+			return $res;
+		}
+		else // We hit an error
+		{
+			$this->error_no = $res->errorcode;
+			$this->error_msg = $res->errortext;
+
+			return false;
+		}
+	}
+
+	public function suspendService($package_id)
+	{
+		$data = array(
+			self::FIELD_FUNCTION => self::CMD_SUSPEND_SERVICES,
+			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
+		);
+
+		$res = $this->_remoteCall($data);
+
+		// Went ok
+		if($res->errorcode == 0)
+		{
+			return $res;
+		}
+		else // We hit an error
+		{
+			$this->error_no = $res->errorcode;
+			$this->error_msg = $res->errortext;
+
+			return false;
+		}
+	}
+
+	public function unsuspendService($package_id)
+	{
+		$data = array(
+			self::FIELD_FUNCTION => self::CMD_UNSUSPEND_SERVICES,
+			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
+		);
+
+		$res = $this->_remoteCall($data);
+
+		// Went ok
+		if($res->errorcode == 0)
+		{
+			return $res;
+		}
+		else // We hit an error
+		{
+			$this->error_no = $res->errorcode;
+			$this->error_msg = $res->errortext;
+
+			return false;
+		}
+	}
+
+	public function deleteService($package_id)
+	{
+		$data = array(
+			self::FIELD_FUNCTION => self::CMD_DELETE_SERVICES,
+			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
+		);
 
 		$res = $this->_remoteCall($data);
 
@@ -236,6 +319,7 @@ class TCAdmin {
 		// Set the form stuff.
 		$browser->setFieldByName('UserName', $username);
 		$browser->setFieldByName('Password', $password);
+		$browser->setFieldByName('CheckBoxRememberMe', '1');
 		$browser->clickSubmitByName('ButtonLogin');
 
 		//exit;
