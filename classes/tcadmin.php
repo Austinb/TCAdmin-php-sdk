@@ -8,7 +8,7 @@
  */
 class TCAdmin {
 
-	static public $connect_string = false;
+	static public $api_connect_string = false;
 
 	/*
 	 * Error Constants
@@ -45,11 +45,20 @@ class TCAdmin {
 	const SETUP_ERRORED = 3;
 
 	/*
-	 * RDP Settings
+	 * Login return settings.
 	 */
-	protected $rdp_url = false;
-	protected $rdp_username = false;
-	protected $rdp_password = false;
+	const LOGIN_REDIRECTED = 1;
+	const LOGIN_SUCCESS = 2;
+	const LOGIN_FAILED = 3;
+
+	/*
+	 * API Settings
+	 */
+	protected $api_url = false;
+	protected $api_username = false;
+	protected $api_password = false;
+
+	protected $login_url = false;
 
 	protected $error_no = self::ERROR_NONE;
 	protected $error_msg = '';
@@ -59,13 +68,13 @@ class TCAdmin {
 	 *
 	 * @var string
 	 */
-	protected $rdp_response_type = self::RESPONSE_TYPE_XML;
+	protected $api_response_type = self::RESPONSE_TYPE_XML;
 
 	// Create new class with static call.
 	public static function factory()
 	{
 		// Make new instance and return
-		return new self(self::$connect_string);
+		return new self(self::$api_connect_string);
 	}
 
 	public function __construct($connect_string=null)
@@ -87,13 +96,13 @@ class TCAdmin {
 		}
 
 		// Create the url we are actually connecting to.
-		$this->rdp_url =  $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?'?'.$connect['query']:'');
+		$this->api_url =  $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?'?'.$connect['query']:'');
 
 		// Set the RDP username
-		$this->rdp_username = $connect['user'];
+		$this->api_username = $connect['user'];
 
 		// Set the RDP password
-		$this->rdp_password = $connect['pass'];
+		$this->api_password = $connect['pass'];
 
 		return $this;
 	}
@@ -101,16 +110,16 @@ class TCAdmin {
 	protected function _remoteCall($data=array())
 	{
 		// Add the proper data
-		$data[self::FIELD_USERNAME] = $this->rdp_username;
-		$data[self::FIELD_PASSWORD] = $this->rdp_password;
-		$data[self::FIELD_RESPONSETYPE] = $this->rdp_response_type;
+		$data[self::FIELD_USERNAME] = $this->api_username;
+		$data[self::FIELD_PASSWORD] = $this->api_password;
+		$data[self::FIELD_RESPONSETYPE] = $this->api_response_type;
 
 		// Init cURL
 		$ch = curl_init();
 
 		// Setup the options
 		curl_setopt_array($ch, array(
-			CURLOPT_URL => $this->rdp_url,
+			CURLOPT_URL => $this->api_url,
 			CURLOPT_TIMEOUT => 15,
 			CURLOPT_MAXREDIRS => 4,
 			CURLOPT_RETURNTRANSFER => true,
@@ -210,6 +219,35 @@ class TCAdmin {
 
 			return false;
 		}
+	}
+
+	public function login($username, $password, $login_url, $useragent, $cookie_name)
+	{
+		// Require the simpletest libs
+		require_once('simpletest/browser.php');
+
+		$agent = 'User-Agent: '.$useragent;
+
+    	$browser = new SimpleBrowser();
+    	$browser->addHeader($agent);
+    	$browser->useCookies();
+		$browser->get($login_url);
+
+		// Set the form stuff.
+		$browser->setFieldByName('UserName', $username);
+		$browser->setFieldByName('Password', $password);
+		$browser->clickSubmitByName('ButtonLogin');
+
+		//exit;
+
+		if(strstr($browser->getTitle(), 'User Main Menu') !== false)
+		{
+			return array(
+				'cookie_value' => $browser->getCurrentCookieValue($cookie_name),
+			);
+		}
+
+		return false;
 	}
 }
 
