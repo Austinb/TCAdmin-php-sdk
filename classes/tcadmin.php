@@ -8,8 +8,6 @@
  */
 class TCAdmin {
 
-	static public $api_connect_string = false;
-
 	/*
 	 * Error Constants
 	 */
@@ -52,30 +50,36 @@ class TCAdmin {
 	const CMD_UPDATE_PASSWORD = 'ChangePassword';
 
 	/*
+	 * Constants for the defined GET params.
+	 */
+	const GET_SERVICEID = 'serviceid';
+	const GET_SERVICE_DESCSHORT = 'svc_short_desc';
+
+
+	const GET_MVSID = 'mvsid';
+	const GET_VVSID = 'vvsid';
+	const GET_VOICETYPE = 'voicetype';
+
+	/*
 	 * Status settings
 	 */
 	const SETUP_PENDING = 1;
 	const SETUP_COMPLETE = 2;
 	const SETUP_ERRORED = 3;
 
-	/*
-	 * Login return settings.
+	/**
+	 * Connection string used for factory construct.
+	 *
+	 * @var string
 	 */
-	const LOGIN_REDIRECTED = 1;
-	const LOGIN_SUCCESS = 2;
-	const LOGIN_FAILED = 3;
+	static public $api_connect_string = false;
 
 	/*
-	 * API Settings
+	 * API Settings. Set after __construct
 	 */
 	protected $api_url = false;
 	protected $api_username = false;
 	protected $api_password = false;
-
-	protected $login_url = false;
-
-	protected $error_no = self::ERROR_NONE;
-	protected $error_msg = '';
 
 	/**
 	 * The response type sent by the tcadmin server you are querying.
@@ -84,14 +88,33 @@ class TCAdmin {
 	 */
 	protected $api_response_type = self::RESPONSE_TYPE_XML;
 
+	/*
+	 * Error stuff.  Only used when there is an error.
+	 */
+	protected $error_no = self::ERROR_NONE;
+	protected $error_msg = '';
+
+	/*
+	 * Actual GUI settings
+	 */
+	static public $root_url = null;
+
+	public $gui_root = null;
+	public $path_login = 'login.aspx';
+	public $path_userhome = 'user_home.aspx';
+	public $path_services = 'services.aspx';
+	public $path_servicehome = 'service_home.aspx';
+	public $path_voiceservers = 'voiceservers.aspx';
+	public $path_voiceservicehome = 'vvoiceserver_home.aspx';
+
 	// Create new class with static call.
 	public static function factory()
 	{
 		// Make new instance and return
-		return new self(self::$api_connect_string);
+		return new self(self::$api_connect_string, self::$root_url);
 	}
 
-	public function __construct($connect_string=null)
+	public function __construct($connect_string=null, $root_url=null)
 	{
 		if(!function_exists('curl_init'))
 		{
@@ -110,13 +133,16 @@ class TCAdmin {
 		}
 
 		// Create the url we are actually connecting to.
-		$this->api_url =  $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?'?'.$connect['query']:'');
+		$this->api_url = $connect['scheme'] . '://' . $connect['host'] . $connect['path'] . ((isset($connect['query']))?'?'.$connect['query']:'');
 
 		// Set the RDP username
 		$this->api_username = $connect['user'];
 
 		// Set the RDP password
 		$this->api_password = $connect['pass'];
+
+		// Set the GUI root
+		$this->gui_root = $root_url;
 
 		return $this;
 	}
@@ -304,25 +330,32 @@ class TCAdmin {
 		}
 	}
 
-	public function login($username, $password, $login_url, $useragent, $cookie_name)
+	/**
+	 * Log a user in using simpletest as a "browser"
+	 *
+	 * @param string $username
+	 * @param string $password
+	 * @param string $useragent
+	 * @param string $cookie_name The name of the cookie as set by TCAdmin
+	 */
+	public function login($username, $password, $useragent, $cookie_name)
 	{
 		// Require the simpletest libs
 		require_once('simpletest/browser.php');
 
+		// Setup the useragent to use the passed one.
 		$agent = 'User-Agent: '.$useragent;
 
     	$browser = new SimpleBrowser();
     	$browser->addHeader($agent);
     	$browser->useCookies();
-		$browser->get($login_url);
+		$browser->get($this->getUrlLogin());
 
 		// Set the form stuff.
 		$browser->setFieldByName('UserName', $username);
 		$browser->setFieldByName('Password', $password);
-		$browser->setFieldByName('CheckBoxRememberMe', '1');
+		$browser->setFieldByName('CheckBoxRememberMe', 'on');
 		$browser->clickSubmitByName('ButtonLogin');
-
-		//exit;
 
 		if(strstr($browser->getTitle(), 'User Main Menu') !== false)
 		{
@@ -332,6 +365,70 @@ class TCAdmin {
 		}
 
 		return false;
+	}
+
+	/*
+	 * Load up the path info.
+	 */
+
+	/**
+	 * Return the root url for the GUI
+	 */
+	public function getUrlRoot()
+	{
+		return $this->gui_root;
+	}
+
+	/**
+	 * Return the user home url.
+	 */
+	public function getUrlLogin()
+	{
+		return $this->gui_root . $this->path_login;
+	}
+
+	/**
+	 * Return the user home url.
+	 */
+	public function getUrlUserHome()
+	{
+		return $this->gui_root . $this->path_userhome;
+	}
+
+	/**
+	 * Get the service url for a specific service.
+	 *
+	 * @param array $args
+	 */
+	public function getUrlService(Array $args=null)
+	{
+		$query = '';
+
+		// We have args so lets make the query.
+		if(count($args) > 0)
+		{
+			$query = '?' . http_build_query($args, '', '&');
+		}
+
+		return $this->gui_root . $this->path_servicehome . $query;
+	}
+
+	/**
+	 * Get the service url for a specific voice service.
+	 *
+	 * @param array $args
+	 */
+	public function getUrlServiceVoice(Array $args=null)
+	{
+		$query = '';
+
+		// We have args so lets make the query.
+		if(count($args) > 0)
+		{
+			$query = '?' . http_build_query($args, '', '&');
+		}
+
+		return $this->gui_root . $this->path_voiceservicehome . $query;
 	}
 }
 
