@@ -147,7 +147,7 @@ class TCAdmin {
 		return $this;
 	}
 
-	protected function _remoteCall($data=array())
+	protected function _remoteCall($data=array(), $timeout=30)
 	{
 		// Add the proper data
 		$data[self::FIELD_USERNAME] = $this->api_username;
@@ -160,11 +160,12 @@ class TCAdmin {
 		// Setup the options
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $this->api_url,
-			CURLOPT_TIMEOUT => 15,
+			CURLOPT_CONNECTTIMEOUT => $timeout,
+			CURLOPT_TIMEOUT => $timeout,
+			CURLOPT_FOLLOWLOCATION => false,
 			CURLOPT_MAXREDIRS => 4,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => false,
-			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_POST => true,
 			CURLOPT_POSTFIELDS => $data,
 		));
@@ -254,7 +255,7 @@ class TCAdmin {
 		}
 		else // We hit an error
 		{
-			$this->error_no = $res->errorcode;
+			$this->error_no = abs($res->errorcode);;
 			$this->error_msg = $res->errortext;
 
 			return false;
@@ -277,7 +278,7 @@ class TCAdmin {
 		}
 		else // We hit an error
 		{
-			$this->error_no = $res->errorcode;
+			$this->error_no = abs($res->errorcode);;
 			$this->error_msg = $res->errortext;
 
 			return false;
@@ -300,7 +301,7 @@ class TCAdmin {
 		}
 		else // We hit an error
 		{
-			$this->error_no = $res->errorcode;
+			$this->error_no = abs($res->errorcode);;
 			$this->error_msg = $res->errortext;
 
 			return false;
@@ -314,7 +315,7 @@ class TCAdmin {
 			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
 		);
 
-		$res = $this->_remoteCall($data);
+		$res = $this->_remoteCall($data, 180);
 
 		// Went ok
 		if($res->errorcode == 0)
@@ -323,7 +324,7 @@ class TCAdmin {
 		}
 		else // We hit an error
 		{
-			$this->error_no = $res->errorcode;
+			$this->error_no = abs($res->errorcode);;
 			$this->error_msg = $res->errortext;
 
 			return false;
