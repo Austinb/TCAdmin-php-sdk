@@ -75,7 +75,7 @@ class SimpleExpectation {
      */
     function &_getDumper() {
         if (! $this->_dumper) {
-            $dumper = &new SimpleDumper();
+            $dumper = new SimpleDumper();
             return $dumper;
         }
         return $this->_dumper;
@@ -122,7 +122,7 @@ class AnythingExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return 'Anything always matches [' . $dumper->describeValue($compare) . ']';
     }
 }
@@ -151,7 +151,7 @@ class FailedExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return 'Failed expectation never matches [' . $dumper->describeValue($compare) . ']';
     }
 }
@@ -181,7 +181,7 @@ class TrueExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return 'Expected true, got [' . $dumper->describeValue($compare) . ']';
     }
 }
@@ -211,7 +211,7 @@ class FalseExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return 'Expected false, got [' . $dumper->describeValue($compare) . ']';
     }
 }
@@ -308,7 +308,7 @@ class NotEqualExpectation extends EqualExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         if ($this->test($compare)) {
             return "Not equal expectation passes " .
                     $dumper->describeDifference($this->_getValue(), $compare);
@@ -528,7 +528,7 @@ class IdenticalExpectation extends EqualExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         if ($this->test($compare)) {
             return "Identical expectation [" . $dumper->describeValue($this->_getValue()) . "]";
         } else {
@@ -576,7 +576,7 @@ class NotIdenticalExpectation extends IdenticalExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         if ($this->test($compare)) {
             return "Not identical expectation passes " .
                     $dumper->describeDifference($this->_getValue(), $compare, TYPE_MATTERS);
@@ -636,7 +636,7 @@ class PatternExpectation extends SimpleExpectation {
         if ($this->test($compare)) {
             return $this->_describePatternMatch($this->_getPattern(), $compare);
         } else {
-            $dumper = &$this->_getDumper();
+            $dumper = $this->_getDumper();
             return "Pattern [" . $this->_getPattern() .
                     "] not detected in [" .
                     $dumper->describeValue($compare) . "]";
@@ -707,7 +707,7 @@ class NoPatternExpectation extends PatternExpectation {
      */
     function testMessage($compare) {
         if ($this->test($compare)) {
-            $dumper = &$this->_getDumper();
+            $dumper = $this->_getDumper();
             return "Pattern [" . $this->_getPattern() .
                     "] not detected in [" .
                     $dumper->describeValue($compare) . "]";
@@ -795,7 +795,7 @@ class IsAExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return "Value [" . $dumper->describeValue($compare) .
                 "] should be type [" . $this->_type . "]";
     }
@@ -839,7 +839,7 @@ class NotAExpectation extends IsAExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         return "Value [" . $dumper->describeValue($compare) .
                 "] should not be type [" . $this->_getType() . "]";
     }
@@ -883,7 +883,7 @@ class MethodExistsExpectation extends SimpleExpectation {
      *    @access public
      */
     function testMessage($compare) {
-        $dumper = &$this->_getDumper();
+        $dumper = $this->_getDumper();
         if (! is_object($compare)) {
             return 'No method on non-object [' . $dumper->describeValue($compare) . ']';
         }

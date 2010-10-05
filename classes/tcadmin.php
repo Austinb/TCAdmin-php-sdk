@@ -54,6 +54,7 @@ class TCAdmin {
 	 */
 	const GET_SERVICEID = 'serviceid';
 	const GET_SERVICE_DESCSHORT = 'svc_short_desc';
+	const GET_RETURNTO = 'returnto';
 
 
 	const GET_MVSID = 'mvsid';
@@ -353,12 +354,13 @@ class TCAdmin {
 		$browser->get($this->getUrlLogin());
 
 		// Set the form stuff.
-		$browser->setFieldByName('UserName', $username);
+		$browser->setFieldByName('UserName', $username);;
 		$browser->setFieldByName('Password', $password);
-		$browser->setFieldByName('CheckBoxRememberMe', 'on');
 		$browser->clickSubmitByName('ButtonLogin');
 
-		if(strstr($browser->getTitle(), 'User Main Menu') !== false)
+		/*//<div class="error_message"  >*/
+
+		if(stristr($browser->getTitle(), 'User Main Menu') !== false)
 		{
 			return array(
 				'cookie_value' => $browser->getCurrentCookieValue($cookie_name),
