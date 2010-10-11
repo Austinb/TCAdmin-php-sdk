@@ -38,6 +38,16 @@ class TCAdmin {
 	const FIELD_USER_LNAME = 'user_lname';
 	const FIELD_USER_PASSWORD = 'user_password';
 
+	// Game settings
+	const FIELD_GAME_SLOTS = 'game_slots';
+	const FIELD_GAME_BRANDED = 'game_branded';
+	const FIELD_GAME_PRIVATE = 'game_private';
+
+	// Voice settings
+	const FIELD_VOICE_SLOTS = 'voice_slots';
+	const FIELD_VOICE_BRANDED = 'voice_branded';
+	const FIELD_VOICE_PRIVATE = 'voice_private';
+
 	const CMD_GET_GAMESERVERS = 'GetSupportedGames';
 	const CMD_GET_VOICESERVERS = 'GetSupportedVoiceServers';
 	const CMD_ADD_SETUP = 'AddPendingSetup';
@@ -317,6 +327,27 @@ class TCAdmin {
 		);
 
 		$res = $this->_remoteCall($data, 180);
+
+		// Went ok
+		if($res->errorcode == 0)
+		{
+			return $res;
+		}
+		else // We hit an error
+		{
+			$this->error_no = abs($res->errorcode);;
+			$this->error_msg = $res->errortext;
+
+			return false;
+		}
+	}
+
+	public function updateService($package_id, $data)
+	{
+		$data[self::FIELD_FUNCTION] = self::CMD_UPDATE_SETTINGS;
+		$data[self::FIELD_CLIENT_PACKAGE_ID] = $package_id;
+
+		$res = $this->_remoteCall($data);
 
 		// Went ok
 		if($res->errorcode == 0)
