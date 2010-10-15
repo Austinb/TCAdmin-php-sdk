@@ -381,7 +381,6 @@ class TCAdmin {
 
     	$browser = new SimpleBrowser();
     	$browser->addHeader($agent);
-    	$browser->useCookies();
 		$browser->get($this->getUrlLogin());
 
 		// Set the form stuff.
