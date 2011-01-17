@@ -326,7 +326,7 @@ class TCAdmin {
 			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
 		);
 
-		$res = $this->_remoteCall($data, 180);
+		$res = $this->_remoteCall($data, 300);
 
 		// Went ok
 		if($res->errorcode == 0)
