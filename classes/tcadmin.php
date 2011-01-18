@@ -104,6 +104,8 @@ class TCAdmin {
 	 */
 	protected $error_no = self::ERROR_NONE;
 	protected $error_msg = '';
+	
+	protected $timeout = 300;
 
 	/*
 	 * Actual GUI settings
@@ -119,13 +121,13 @@ class TCAdmin {
 	public $path_voiceservicehome = 'vvoiceserver_home.aspx';
 
 	// Create new class with static call.
-	public static function factory()
+	public static function factory($timeout=300)
 	{
 		// Make new instance and return
-		return new self(self::$api_connect_string, self::$root_url);
+		return new self(self::$api_connect_string, self::$root_url, $timeout);
 	}
 
-	public function __construct($connect_string=null, $root_url=null)
+	public function __construct($connect_string=null, $root_url=null, $timeout=300)
 	{
 		if(!function_exists('curl_init'))
 		{
@@ -158,7 +160,7 @@ class TCAdmin {
 		return $this;
 	}
 
-	protected function _remoteCall($data=array(), $timeout=30)
+	protected function _remoteCall($data=array())
 	{
 		// Add the proper data
 		$data[self::FIELD_USERNAME] = $this->api_username;
@@ -171,7 +173,7 @@ class TCAdmin {
 		// Setup the options
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $this->api_url,
-			CURLOPT_CONNECTTIMEOUT => $timeout,
+			CURLOPT_CONNECTTIMEOUT => $this->timeout,
 			CURLOPT_TIMEOUT => $timeout,
 			CURLOPT_FOLLOWLOCATION => false,
 			CURLOPT_MAXREDIRS => 4,
@@ -326,7 +328,7 @@ class TCAdmin {
 			self::FIELD_CLIENT_PACKAGE_ID => $package_id,
 		);
 
-		$res = $this->_remoteCall($data, 300);
+		$res = $this->_remoteCall($data);
 
 		// Went ok
 		if($res->errorcode == 0)
