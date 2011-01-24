@@ -104,7 +104,7 @@ class TCAdmin {
 	 */
 	protected $error_no = self::ERROR_NONE;
 	protected $error_msg = '';
-	
+
 	protected $timeout = 300;
 
 	/*
@@ -174,7 +174,7 @@ class TCAdmin {
 		curl_setopt_array($ch, array(
 			CURLOPT_URL => $this->api_url,
 			CURLOPT_CONNECTTIMEOUT => $this->timeout,
-			CURLOPT_TIMEOUT => $timeout,
+			CURLOPT_TIMEOUT => $this->timeout,
 			CURLOPT_FOLLOWLOCATION => false,
 			CURLOPT_MAXREDIRS => 4,
 			CURLOPT_RETURNTRANSFER => true,
