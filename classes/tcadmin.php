@@ -2,9 +2,25 @@
 /**
  * TCAdmin API Interface
  *
- * For use with TCAdmin - http://www.tcadmin.com/
+ * Provides a cURL based interface with TCAdmin (http://www.tcadmin.com/) to allow
+ * some control over servers as well as installing and deleting servers.
  *
- * @author Austin Bischoff <austin(dot)bischoff(at)gmail(dot)com>
+ * @author Austin Bischoff <austin@codebeard.com>
+ *
+ * This file is part of TCAdmin-PHP-SDK.
+ *
+ * TCAdmin-PHP-SDK is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * TCAdmin-PHP-SDK is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with TaskDaemon.  If not, see <http://www.gnu.org/licenses/>.
  */
 class TCAdmin {
 
@@ -66,7 +82,9 @@ class TCAdmin {
 	const GET_SERVICE_DESCSHORT = 'svc_short_desc';
 	const GET_RETURNTO = 'returnto';
 
-
+	/*
+	 * Constants used for creating links to services within the TCAdmin interface (control panel).
+	 */
 	const GET_MVSID = 'mvsid';
 	const GET_VVSID = 'vvsid';
 	const GET_VOICETYPE = 'voicetype';
