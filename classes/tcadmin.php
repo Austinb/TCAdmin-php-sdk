@@ -96,6 +96,12 @@ class TCAdmin {
 	const SETUP_COMPLETE = 2;
 	const SETUP_ERRORED = 3;
 
+	/*
+	 * Billing status settings
+	 */
+	const BILLING_STATUS_ACTIVE = 1;
+	const BILLING_STATUS_SUSPENDED = 2;
+
 	/**
 	 * Connection string used for factory construct.
 	 *
