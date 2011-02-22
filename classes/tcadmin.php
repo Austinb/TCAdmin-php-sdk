@@ -399,6 +399,8 @@ class TCAdmin {
 	 */
 	public function login($username, $password, $useragent, $cookie_name)
 	{
+		$return = false;
+
 		ob_start();
 		// Require the simpletest libs
 		require_once('simpletest/browser.php');
@@ -412,24 +414,23 @@ class TCAdmin {
 		$browser->get($this->getUrlLogin());
 
 		// Set the form stuff.
-		$browser->setFieldByName('UserName', $username);
-		$browser->setFieldByName('Password', $password);
-		$browser->clickSubmitByName('ButtonLogin');
+		$browser->setField('UserName', $username);
+		$browser->setField('Password', $password);
+		$browser->click('Login');
 
 		/*//<div class="error_message"  >*/
 
+		ob_end_clean();
+
 		if(stristr($browser->getTitle(), 'User Main Menu') !== false)
 		{
-			ob_end_clean();
-
-			return array(
+			$return = array(
 				'cookie_value' => $browser->getCurrentCookieValue($cookie_name),
 			);
 		}
 
-		ob_end_clean();
 
-		return false;
+		return $return;
 	}
 
 	/*
