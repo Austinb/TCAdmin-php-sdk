@@ -214,6 +214,7 @@ class TCAdmin {
 			return false;
 		}
 
+		// Close cURL connection
 		curl_close($ch);
 
 		if(($xml = simplexml_load_string($result)) === false)
@@ -222,22 +223,10 @@ class TCAdmin {
 			return false;
 		}
 
+		// Unset some stuff to free some memory
+		unset($result, $ch, $data);
+
 		return $xml;
-
-		/*// Now lets try to load up the return as xml.
-		$dom = new DOMDocument();
-
-		$dom->preserveWhiteSpace = false;
-
-		if(!$dom->loadXML($result, LIBXML_NOBLANKS))
-		{
-			throw new TCAdminException('Unable to parse return as XML.', self::ERROR_CURLRESPONSEINVALID);
-			return false;
-		}
-
-		$xpath = new DOMXPath($dom);
-
-		echo $dom->saveXML();*/
 	}
 
 	public function getErrorCode()
@@ -299,6 +288,11 @@ class TCAdmin {
 		}
 	}
 
+	/**
+	 * Suspend a service
+	 *
+	 * @param string $package_id
+	 */
 	public function suspendService($package_id)
 	{
 		$data = array(
@@ -322,6 +316,11 @@ class TCAdmin {
 		}
 	}
 
+	/**
+	 * Unsuspend a service
+	 *
+	 * @param string $package_id
+	 */
 	public function unsuspendService($package_id)
 	{
 		$data = array(
@@ -345,6 +344,11 @@ class TCAdmin {
 		}
 	}
 
+	/**
+	 * Delete a service
+	 *
+	 * @param string $package_id
+	 */
 	public function deleteService($package_id)
 	{
 		$data = array(
@@ -368,6 +372,12 @@ class TCAdmin {
 		}
 	}
 
+	/**
+	 * Make changed to a service
+	 *
+	 * @param string $package_id
+	 * @param array $data
+	 */
 	public function updateService($package_id, $data)
 	{
 		$data[self::FIELD_FUNCTION] = self::CMD_UPDATE_SETTINGS;
@@ -432,10 +442,6 @@ class TCAdmin {
 
 		return $return;
 	}
-
-	/*
-	 * Load up the path info.
-	 */
 
 	/**
 	 * Return the root url for the GUI
